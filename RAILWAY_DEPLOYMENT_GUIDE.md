@@ -9,13 +9,14 @@ O Railway é uma plataforma de nuvem que facilita a publicação de projetos com
 
 ## Passo 1: Prepare seu Projeto para o GitHub
 
-1. **Descompacte o arquivo** `projeto_site_atualizado_FUNCIONANDO.zip` que eu te enviei.
-2. **Crie um novo repositório no GitHub**:
+1. **Descompacte o arquivo** `projeto_site_atualizado_PARA_RAILWAY.zip` que eu te enviei.
+2. **ATENÇÃO**: Eu adicionei `gunicorn` ao arquivo `requirements.txt` para corrigir o erro de "comando não encontrado" no Railway. Certifique-se de que seu `requirements.txt` no GitHub contenha `gunicorn`.
+3. **Crie um novo repositório no GitHub**:
    - Vá para [github.com/new](https://github.com/new).
    - Dê um nome ao seu repositório (ex: `meu-site-processos`).
    - Marque como **Público** ou **Privado**.
    - Clique em **Criar repositório**.
-3. **Envie seu projeto para o GitHub**:
+4. **Envie seu projeto para o GitHub**:
    - Se você tem `git` instalado, use a linha de comando:
      ```bash
      git init
