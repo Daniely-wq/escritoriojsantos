@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Processos - Jeferson Santos Advocacia</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            max-width: 300px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #1e3a8a;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .stats-chart {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-chart h3 {
+            color: #1e3a8a;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            flex: 1;
+        }
+
+        .search-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 1.1rem;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+        }
+
+        .search-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.3);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .client-info {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #1e3a8a;
+        }
+
+        .client-info h3 {
+            color: #1e3a8a;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .client-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .client-detail {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .client-detail .label {
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .client-detail .value {
+            color: #334155;
+            font-size: 1.1rem;
+        }
+
+        .processes-section {
+            margin-top: 25px;
+        }
+
+        .processes-section h3 {
+            color: #1e3a8a;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+        }
+
+        .process-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .process-card:hover {
+            border-color: #1e3a8a;
+            box-shadow: 0 5px 15px rgba(30, 58, 138, 0.1);
+        }
+
+        .process-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .process-detail {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .process-detail .label {
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .process-detail .value {
+            color: #334155;
+            font-size: 1rem;
+        }
+
+        .export-btn {
+            margin-top: 25px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #dc2626;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #1e3a8a;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .footer-section h3 {
+            color: #60a5fa;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-item:hover {
+            transform: translateX(5px);
+        }
+
+        .contact-item .icon {
+            margin-right: 15px;
+            font-size: 1.2rem;
+            width: 25px;
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #374151;
+            color: #9ca3af;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-chart {
+                position: static;
+                width: 100%;
+                max-width: 300px;
+                margin: 20px auto 0;
+            }
+
+            .search-section, .result-section {
+                padding: 25px;
+            }
+
+            .client-details, .process-info {
+                grid-template-columns: 1fr;
+            }
+
+            .footer {
+                padding: 30px 20px;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="LOGO.jpg" alt="Jeferson Santos Advocacia" class="logo">
+            <h1>Consulta de Processos</h1>
+            <p>Sistema de consulta de processos jurídicos por CPF</p>
+            
+            <div class="stats-chart">
+                <h3>Estatísticas das Ações</h3>
+                <canvas id="statsChart" width="170" height="120"></canvas>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <form class="search-form" id="searchForm">
+                <div class="form-group">
+                    <label for="cpf">Digite o CPF do cliente:</label>
+                    <div class="input-container">
+                        <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required>
+                    </div>
+                </div>
+                <button type="submit" class="search-btn">Buscar Processos</button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Buscando informações...</p>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <h2 style="color: #1e3a8a; margin-bottom: 25px; font-size: 1.8rem;">Resultado da Consulta</h2>
+            
+            <div class="client-info" id="clientInfo">
+                <!-- Informações do cliente serão inseridas aqui -->
+            </div>
+            
+            <div class="processes-section">
+                <h3>Processos do Cliente</h3>
+                <div id="processesList">
+                    <!-- Lista de processos será inserida aqui -->
+                </div>
+            </div>
+            
+            <button class="export-btn" id="exportBtn">Exportar para PDF</button>
+        </div>
+
+        <div class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Contato</h3>
+                    <div class="contact-item">
+                        <span class="icon">📞</span>
+                        <span>(79) 9.8150-9934 – Cálculos Jurídicos Daniely</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="icon">📞</span>
+                        <span>(79) 9.8833-9003 – Dr. Jeferson OAB 12.878</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="icon">✉️</span>
+                        <span>escritoriojsantosadvocacia@gmail.com</span>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Endereços</h3>
+                    <div class="contact-item">
+                        <span class="icon">📍</span>
+                        <span>Rua Lagarto, 1034 – Centro, Aracaju/SE</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="icon">📍</span>
+                        <span>Rua Cabo Resende, 112 – Barra dos Coqueiros/SE</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="icon">🌐</span>
+                        <span>jefersonsantos.godaddysites.com</span>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Redes Sociais</h3>
+                    <p>Siga-nos nas redes sociais para ficar por dentro das novidades:</p>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/j.santos_advocacia/" target="_blank" class="social-link" title="Instagram">
+                            📷
+                        </a>
+                        <a href="https://api.whatsapp.com/send/?phone=5579988339003" target="_blank" class="social-link" title="WhatsApp">
+                            💬
+                        </a>
+                        <a href="https://jefersonsantos.godaddysites.com/" target="_blank" class="social-link" title="Site">
+                            🌐
+                        </a>
+                        <a href="mailto:escritoriojsantosadvocacia@gmail.com" class="social-link" title="Email">
+                            ✉️
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Jeferson Santos Advocacia & Assessoria Jurídica. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentResult = null;
+        let statsChart = null;
+
+        // Inicializar gráfico de estatísticas
+        async function initStatsChart() {
+            try {
+                const response = await fetch('/statistics');
+                const data = await response.json();
+                
+                if (response.ok && data.length > 0) {
+                    const ctx = document.getElementById('statsChart').getContext('2d');
+                    
+                    // Cores para o gráfico
+                    const colors = [
+                        '#1e3a8a', '#1e40af', '#1d4ed8', '#2563eb', '#3b82f6',
+                        '#60a5fa', '#93c5fd', '#dbeafe', '#059669', '#10b981'
+                    ];
+                    
+                    statsChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.map(item => item.action),
+                            datasets: [{
+                                data: data.map(item => item.count),
+                                backgroundColor: colors.slice(0, data.length),
+                                borderWidth: 2,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const item = data[context.dataIndex];
+                                            return `${item.action}: ${item.count} (${item.percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+            }
+        }
+
+        // Máscara para CPF
+        document.getElementById('cpf').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = value;
+        });
+
+        // Buscar dados
+        document.getElementById('searchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const cpf = document.getElementById('cpf').value;
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('errorMessage');
+            const resultSection = document.getElementById('resultSection');
+            
+            // Limpar mensagens anteriores
+            errorMessage.style.display = 'none';
+            resultSection.style.display = 'none';
+            loading.style.display = 'block';
+            
+            try {
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ cpf: cpf })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentResult = data;
+                    displayResult(data);
+                    resultSection.style.display = 'block';
+                } else {
+                    showError(data.error || 'Erro na busca');
+                }
+            } catch (error) {
+                showError('Erro de conexão. Tente novamente.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        function displayResult(data) {
+            const clientInfo = document.getElementById('clientInfo');
+            const processesList = document.getElementById('processesList');
+            
+            // Informações do cliente
+            clientInfo.innerHTML = `
+                <h3>Informações do Cliente</h3>
+                <div class="client-details">
+                    <div class="client-detail">
+                        <span class="label">Nome:</span>
+                        <span class="value">${data.nome}</span>
+                    </div>
+                    <div class="client-detail">
+                        <span class="label">CPF:</span>
+                        <span class="value">${data.cpf}</span>
+                    </div>
+                </div>
+            `;
+            
+            // Lista de processos
+            let processesHtml = '';
+            data.processos.forEach((processo, index) => {
+                processesHtml += `
+                    <div class="process-card">
+                        <div class="process-info">
+                            <div class="process-detail">
+                                <span class="label">Nome:</span>
+                                <span class="value">${processo.nome}</span>
+                            </div>
+                            <div class="process-detail">
+                                <span class="label">CPF:</span>
+                                <span class="value">${processo.cpf}</span>
+                            </div>
+                            <div class="process-detail">
+                                <span class="label">Ação:</span>
+                                <span class="value">${processo.acao}</span>
+                            </div>
+                            <div class="process-detail">
+                                <span class="label">N° Processo:</span>
+                                <span class="value">${processo.numero}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            processesList.innerHTML = processesHtml;
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        // Exportar para PDF
+        document.getElementById('exportBtn').addEventListener('click', async function() {
+            if (!currentResult) return;
+            
+            try {
+                const response = await fetch('/export-pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(currentResult)
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `processos_${currentResult.cpf.replace(/[^0-9]/g, '')}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    showError('Erro ao gerar PDF');
+                }
+            } catch (error) {
+                showError('Erro ao exportar PDF');
+            }
+        });
+
+        // Inicializar gráfico quando a página carregar
+        window.addEventListener('load', initStatsChart);
+    </script>
+</body>
+</html>
+
